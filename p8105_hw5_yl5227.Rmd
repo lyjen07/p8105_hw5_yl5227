@@ -25,7 +25,7 @@ df_homocide =
       ))
 ```
 
-This dataset gathered data on homicides in 50 large U.S. cities. The resulting dataframe has `r nrow(homicide_df)` entries, on variables that include the victim name, race, age, and sex; the date the homicide was reported; and the location of the homicide. In cleaning, I created a `city_state` variable that includes both city and state, and a `resolution` variable to indicate whether the case was closed by arrest. I also excluded one entry in Tulsa, AL, which is not a major US city and is most likely a data entry error.
+This dataset gathered data on homicides in 50 large U.S. cities. The resulting dataframe has `r nrow(df_homocide)` entries, on variables that include the victim name, race, age, and sex; the date the homicide was reported; and the location of the homicide. In cleaning, I created a `city_state` variable that includes both city and state, and a `status` variable to indicate whether the case was closed by arrest. I also excluded one entry in Tulsa, AL, which is not a major US city and is most likely a data entry error.
 
 Let's summarize total number of homicides and unsolved homicides within cities.
 
@@ -36,5 +36,48 @@ df_city_homcide =
   summarize(
     total_homocide = n(),
     unsolved_homocide = sum(status == "unsolved"))
+```
+
+
+# Problem 2
+
+```{r}
+df_all_participants =
+  tibble(
+    file_names = list.files(path = "data", pattern = "(con|exp)_\\d\\d.csv", full.names = TRUE),
+    data = map(file_names, read_csv)) |> 
+  separate(file_names, into = c("arm", "subject_id"), sep = "\\_") |> 
+  mutate(
+    arm = str_remove(arm, "data/"),
+    subject_id = str_remove(subject_id, ".csv")
+  ) |> 
+  unnest(data) |> 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    names_prefix = "week_",
+    values_to = "value"
+  ) |> 
+  mutate(week = as.numeric(week))
+```
+
+
+Make a spaghetti plot
+
+```{r}
+df_all_participants |> 
+  ggplot(aes(x = week, y = value, group = str_c(subject_id,arm), color = arm)) +
+  geom_line()
+```
+
+
+
+# Problem 3
+
+```{r}
+
+
+
+
 ```
 
