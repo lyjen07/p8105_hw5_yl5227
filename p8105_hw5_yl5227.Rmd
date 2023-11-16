@@ -134,3 +134,14 @@ one_sample_t_test = function(mu = 0, sigma = 5, n = 30, num_sample = 5000){
   tibble(mu = mu, p_rej = p_rej, mu_est = mu_est, mu_rej = mu_rej)
 }
 ```
+
+Iterating the function for `mu` ={0,1,2,3,4,5,6}:
+
+```{r, cache = TRUE}
+exp_res = 
+  0:6 |>
+  map_df(one_sample_t_test)
+
+exp_res
+```
+
