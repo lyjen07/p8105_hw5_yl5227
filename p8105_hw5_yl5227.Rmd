@@ -7,6 +7,25 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(viridis)
+
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 # Problem 1
@@ -41,14 +60,18 @@ df_city_homcide =
 
 # Problem 2
 
-```{r}
+This zip file contains data that allows tracking of changes in observations over multiple weeks for each subject within their assigned group.
+
+Create a tidy dataframe containing data from all participants, including the subject ID, arm, and observations over time.
+
+```{r message = FALSE}
 df_all_participants =
   tibble(
     file_names = list.files(path = "data", pattern = "(con|exp)_\\d\\d.csv", full.names = TRUE),
     data = map(file_names, read_csv)) |> 
-  separate(file_names, into = c("arm", "subject_id"), sep = "\\_") |> 
+  separate(file_names, into = c("group", "subject_id"), sep = "\\_") |> 
   mutate(
-    arm = str_remove(arm, "data/"),
+    group = str_remove(group, "data/"),
     subject_id = str_remove(subject_id, ".csv")
   ) |> 
   unnest(data) |> 
@@ -59,23 +82,26 @@ df_all_participants =
     values_to = "value"
   ) |> 
   mutate(week = as.numeric(week))
+
+df_all_participants
 ```
 
+The provided dataframe `df_all_participants` contains longitudinal data from a study with both control and experimental groups. It has a total of `r nrow(df_all_participants)` entries, structured on variables that include `group` to specify the arm (control or experimental), `subject_id` for participant identification, `week` to denote the time point of the observation, and `value` representing the measurement or observation recorded. Each participant's data is compiled in a distinct file, named with their respective subject ID and group designation.
 
 Make a spaghetti plot
 
 ```{r}
 df_all_participants |> 
-  ggplot(aes(x = week, y = value, group = str_c(subject_id,arm), color = arm)) +
-  geom_line()
+  ggplot(aes(x = week, y = value, group = str_c(subject_id,group), color = group)) +
+  geom_line() +
+  labs(title = "Values on each Subject Over Time")
 ```
 
-
+In the control group, the data points for each participant remain relatively stable, showing little change over time. However, in the experimental group, there's a clear pattern of growth, with measurements for each subject showing an upward trajectory with each passing week.
 
 # Problem 3
 
 ```{r}
-
 
 
 
